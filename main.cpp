@@ -8,6 +8,7 @@
 #include "memoryArray.h"
 #include "vm.h"
 
+
 int main(int argc, char** argv)
 {
 	if(argc != 2)
@@ -15,8 +16,8 @@ int main(int argc, char** argv)
 		throw runtime_error("You must specify an assembly file to execute when invoking this program."); 
 	}
 
-
-
+	vm virtualMachine{string(argv[1])};
+	virtualMachine.Run();
 
 	return 0;
 }

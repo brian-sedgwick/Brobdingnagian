@@ -6,6 +6,6 @@ using namespace std;
 
 void vm::Run()
 {
-		std::cout << "vm.Run()" << endl;
+		cout << "vm.Run() : filename -> " << filename << endl;
 		twoPassAssembler.start();
 }
