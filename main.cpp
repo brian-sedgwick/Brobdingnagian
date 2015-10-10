@@ -5,7 +5,6 @@
 #include <exception>
 #include <climits>
 
-#include "memoryArray.h"
 #include "vm.h"
 
 
