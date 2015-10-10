@@ -17,6 +17,7 @@ int main(int argc, char** argv)
 
 	vm virtualMachine{string(argv[1])};
 	virtualMachine.Run();
-
-	return 0;
+	#ifdef __linux__
+		cout << endl;
+	#endif
 }

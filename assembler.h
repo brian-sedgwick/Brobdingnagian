@@ -8,9 +8,17 @@
 class assembler
 {
 public:
+	const static int INSTRUCTION_SIZE = 3 * sizeof(int);
+	const static int OPERAND_SIZE = sizeof(int);
+
+	std::unordered_map<std::string, int> opCodeTable;
+	std::unordered_map<std::string, int> directivesTable;	
+	std::unordered_map<std::string, int> registerTable;	
+	std::unordered_map<int, std::string> symbolTypeTable;
 	assembler(std::string filename, memoryArray* mem): assemblyFileName(filename)
 	{
 		memory = mem;
+		
 		// Name -> Size
 		directivesTable = 
 		{
@@ -44,18 +52,15 @@ public:
 		};
 	}
 	
-	void start();
+	int start();
 
 private:
-	int memSize;
+	int codeBlockBeginning = -1;
 	memoryArray* memory;
 
 	std::string assemblyFileName;
 	std::unordered_map<std::string, int> symbolTable;
-	std::unordered_map<std::string, int> opCodeTable;
-	std::unordered_map<std::string, int> directivesTable;	
-	std::unordered_map<std::string, int> registerTable;	
-
+	
 	void firstPassAssembler();
 	void secondPassAssembler();
 	void writeDirectiveToMemory(string token, int value, int memoryLocation);
@@ -63,7 +68,6 @@ private:
 	int parseOperand(string operand);
 	std::string stripComments(std::string);
 	std::string trim(std::string);
-	bool addSymbolToTable();
 };
 
 #endif

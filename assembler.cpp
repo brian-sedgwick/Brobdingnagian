@@ -6,10 +6,11 @@
 using namespace std;
 
 
-void assembler::start()
+int assembler::start()
 {
 	firstPassAssembler();
 	secondPassAssembler();
+	return codeBlockBeginning;
 }
 
 void assembler::firstPassAssembler()
@@ -35,7 +36,7 @@ void assembler::firstPassAssembler()
 		// The line is an instruction that starts with an op code.
 		if(opCodeTable.find(token) != opCodeTable.end())
 		{
-			memoryLocation += 12;
+			memoryLocation += INSTRUCTION_SIZE;
 		}
 		// The line starts with a label.
 		else if(directivesTable.find(token) == directivesTable.end())
@@ -54,7 +55,7 @@ void assembler::firstPassAssembler()
 			// The line was a labeled instruction.
 			if(opCodeTable.find(token2) != opCodeTable.end())
 			{
-				memoryLocation += 12;
+				memoryLocation += INSTRUCTION_SIZE;
 			}
 			// The line was a labeled directive.
 			else if(directivesTable.find(token2) != directivesTable.end())
@@ -72,7 +73,6 @@ void assembler::firstPassAssembler()
 			throw runtime_error("Expected a label or op code at line " + to_string(lineNumber));
 		}		
 	}
-	f.close();
 
 	#ifdef DEBUG
 		cout << "Symbol Table Contents:" << endl;
@@ -123,6 +123,14 @@ void assembler::secondPassAssembler()
 		}
 		else if(opCodeTable.find(token) != opCodeTable.end()) // The token is a directive.
 		{
+			// Set the location of the Code Block.
+			if(codeBlockBeginning == -1)
+			{ 
+				codeBlockBeginning = memoryLocation;
+				#ifdef DEBUG
+					cout << "Beginning of Code Block: " << codeBlockBeginning << endl;
+				#endif
+			}
 			string operand1;
 			string operand2;
 			int operand1_value;
@@ -146,7 +154,7 @@ void assembler::secondPassAssembler()
 				operand2_value = parseOperand(operand2);
 			}
 			writeOpCodeToMemory(opCodeTable[token], operand1_value, operand2_value, memoryLocation);
-			memoryLocation += 12;
+			memoryLocation += INSTRUCTION_SIZE;
 		}
 		else { throw runtime_error("Unexpected token: " + token); }
 	}
@@ -154,6 +162,7 @@ void assembler::secondPassAssembler()
 
 void assembler::writeDirectiveToMemory(string directive, int value, int location)
 {
+	symbolTypeTable.insert({location, directive});
 	if(directive == ".INT")
 	{
 		memory->writeInt(location, value);
@@ -167,9 +176,9 @@ void assembler::writeDirectiveToMemory(string directive, int value, int location
 void assembler::writeOpCodeToMemory(int opCodeVal, int op1Val, int op2Val, int startingLocation)
 {
 	memory->writeInt(startingLocation, opCodeVal);
-	startingLocation += sizeof(int);
+	startingLocation += OPERAND_SIZE;
 	memory->writeInt(startingLocation, op1Val);
-	startingLocation += sizeof(int);
+	startingLocation += OPERAND_SIZE;
 	memory->writeInt(startingLocation, op2Val);
 }
 
