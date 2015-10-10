@@ -106,6 +106,10 @@ void assembler::secondPassAssembler()
 		string token;
 		ss >> token;
 
+		#ifdef DEBUG
+			cout << "Loading line: " << input << endl;
+		#endif
+		
 		if(symbolTable.find(token) != symbolTable.end())// The token is a label. Discard.
 		{ 
 			if(!(ss >> token)) { throw runtime_error(""); }
@@ -146,7 +150,6 @@ void assembler::secondPassAssembler()
 		}
 		else { throw runtime_error("Unexpected token: " + token); }
 	}
-	
 }
 
 void assembler::writeDirectiveToMemory(string directive, int value, int location)
