@@ -92,15 +92,25 @@ void assembler::secondPassAssembler()
 	int lineNumber = 0;
 	int memoryLocation = 0;
 
-	while(f >> input)
+	while(getline(f, input))
 	{
 		++lineNumber;
+
+		if(input == ""){ continue; } // Skip blank lines.
+		input = stripComments(input); // Remove comments.
+		if(input == ""){ continue; } // Skip lines that only had comments.
+		input = trim(input); // Remove leading and trailing white space.
+		if(input == ""){ continue; } // Skip blank lines.
+
 		stringstream ss(input);
 		string token;
 		ss >> token;
 
-		if(symbolTable.find(token) != symbolTable.end()){ ss >> token; } // The token is a label. Discard.
-		else if(directivesTable.find(token) != directivesTable.end())// The token is a directive.
+		if(symbolTable.find(token) != symbolTable.end())// The token is a label. Discard.
+		{ 
+			if(!(ss >> token)) { throw runtime_error(""); }
+		} 
+		if(directivesTable.find(token) != directivesTable.end())// The token is a directive.
 		{
 			int value;
 			ss >> value;
@@ -136,6 +146,7 @@ void assembler::secondPassAssembler()
 		}
 		else { throw runtime_error("Unexpected token: " + token); }
 	}
+	
 }
 
 void assembler::writeDirectiveToMemory(string directive, int value, int location)
@@ -161,7 +172,15 @@ void assembler::writeOpCodeToMemory(int opCodeVal, int op1Val, int op2Val, int s
 
 int assembler::parseOperand(string operand)
 {
-	return 0;
+	if(registerTable.find(operand) != registerTable.end())
+	{
+		return registerTable[operand];
+	}
+	if(symbolTable.find(operand) != symbolTable.end())
+	{
+		return symbolTable[operand];
+	}
+	return stoi(operand);
 }
 
 string assembler::stripComments(string input)
