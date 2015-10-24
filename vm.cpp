@@ -17,6 +17,10 @@ void vm::Run()
 
 void vm::setupEnvironment()
 {
+	if(codeBlockLocation == -1)
+	{
+		throw runtime_error("There was apparently no executable code in the assembly file!");
+	}
 	reg[Register::PC] = codeBlockLocation;
 }
 
@@ -98,6 +102,7 @@ void vm::decodeAndExecute()
 						 << reg[Register::R6] << "," 
 						 << reg[Register::R7] << " } "
 						 << "PC->{ " << reg[Register::PC] << " }" << endl; 
+					break;
 				}
 			#endif
 				default:
@@ -108,9 +113,84 @@ void vm::decodeAndExecute()
 			break;
 		}
 
+		case opCode::JMP :
+		{
+			reg[Register::PC] = IR.op1;
+			break;
+		}
+
+		case opCode::JMR :
+		{
+			reg[Register::PC] = reg[IR.op1];
+			break;
+		}
+
+		case opCode::BNZ :
+		{
+			if(reg[IR.op1] != 0)
+			{
+				reg[Register::PC] = IR.op2;
+			}
+			break;
+		}
+
+		case opCode::BGT :
+		{
+			if(reg[IR.op1] > 0)
+			{
+				reg[Register::PC] = IR.op2;
+			}
+			break;
+		}
+
+		case opCode::BLT :
+		{
+			if(reg[IR.op1] < 0)
+			{
+				reg[Register::PC] = IR.op2;
+			}
+			break;
+		}
+
+		case opCode::BRZ :
+		{
+			if(reg[IR.op1] == 0)
+			{
+				reg[Register::PC] = IR.op2;
+			}
+			break;
+		}
+
 		case opCode::MOV :
 		{
 			reg[IR.op1] = reg[IR.op2];
+			break;
+		}
+
+		case opCode::LDA :
+		{
+			if(IR.op2 >= codeBlockLocation)
+			{
+				throw runtime_error("Cannot load the address of code using LDA!");
+			}
+			reg[IR.op1] = IR.op2;
+			break;
+		}
+
+		case opCode::STR :
+		{
+			if( twoPassAssembler.symbolTypeTable[IR.op2] == ".INT" )
+			{
+				memory.writeInt(IR.op2, reg[IR.op1]);
+			}
+			else if( twoPassAssembler.symbolTypeTable[IR.op2] == ".BYT" )
+			{
+				memory.writeChar(IR.op2, reg[IR.op1]);
+			}
+			else
+			{
+				throw runtime_error("Unexpected directive on decode: " + twoPassAssembler.symbolTypeTable[IR.op2] );
+			}
 			break;
 		}
 
@@ -120,7 +200,7 @@ void vm::decodeAndExecute()
 			{
 				reg[IR.op1] = memory.readInt(IR.op2);
 			}
-			else if( twoPassAssembler.symbolTypeTable[IR.op2] == ".BYT")
+			else if( twoPassAssembler.symbolTypeTable[IR.op2] == ".BYT" )
 			{
 				reg[IR.op1] = memory.readChar(IR.op2);
 			}
@@ -131,9 +211,27 @@ void vm::decodeAndExecute()
 			break;
 		}
 
+		case opCode::STB :
+		{
+			memory.writeChar(IR.op2, reg[IR.op1]);
+			break;
+		}
+
+		case opCode::LDB :
+		{
+			reg[IR.op1] = memory.readChar(IR.op2);
+			break;
+		}
+
 		case opCode::ADD :
 		{
 			reg[IR.op1] += reg[IR.op2];
+			break;
+		}
+
+		case opCode::ADI :
+		{
+			reg[IR.op1] += IR.op2;
 			break;
 		}
 
@@ -152,6 +250,26 @@ void vm::decodeAndExecute()
 		case opCode::DIV :
 		{
 			reg[IR.op1] /= reg[IR.op2];
+			break;
+		}
+
+		case opCode::AND :
+		{
+			reg[IR.op1] = reg[IR.op1] && reg[IR.op2];
+			break;
+		}
+
+		case opCode::OR :
+		{
+			reg[IR.op1] = reg[IR.op1] || reg[IR.op2];
+			break;
+		}
+
+		case opCode::CMP :
+		{
+			if(reg[IR.op1] == reg[IR.op2]){ reg[IR.op1] = 0; }
+			if(reg[IR.op1] > reg[IR.op2]){ reg[IR.op1] = 1; }
+			if(reg[IR.op1] < reg[IR.op2]){ reg[IR.op1] = -1; }
 			break;
 		}
 

@@ -30,12 +30,26 @@ public:
 		opCodeTable = 
 		{
 			{ "TRP", 0 },
+			{ "JMP", 1 },
+			{ "JMR", 2 },
+			{ "BNZ", 3 },
+			{ "BGT", 4 },
+			{ "BLT", 5 },
+			{ "BRZ", 6 },
 			{ "MOV", 7 },
+			{ "LDA", 8 },
+			{ "STR", 9 },
 			{ "LDR", 10 },
+			{ "STB", 11 },
+			{ "LDB", 12 },
 			{ "ADD", 13 },
+			{ "ADI", 14 },
 			{ "SUB", 15 },
 			{ "MUL", 16 },
 			{ "DIV", 17 },
+			{ "AND", 18 },
+			{ "OR",  19 },
+			{ "CMP", 20 },
 		};
 
 		// Register Name -> Register index

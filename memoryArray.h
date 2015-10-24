@@ -21,7 +21,7 @@ private:
 public:
 	memoryArray()
 	{
-		memory = new char[MEM_SIZE];
+		memory = new char[MEM_SIZE]{0};
 	}
 	
 	~memoryArray()

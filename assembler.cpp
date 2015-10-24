@@ -38,8 +38,13 @@ void assembler::firstPassAssembler()
 		{
 			memoryLocation += INSTRUCTION_SIZE;
 		}
+		// The line is a directive with no label.  (Probably an array member)
+		else if(directivesTable.find(token) != directivesTable.end())
+		{
+			memoryLocation += directivesTable[token];
+		}
 		// The line starts with a label.
-		else if(directivesTable.find(token) == directivesTable.end())
+		else
 		{
 			string token2;
 			ss >> token2;
@@ -68,10 +73,6 @@ void assembler::firstPassAssembler()
 				throw runtime_error("Expected a directive or op code after label on line " + to_string(lineNumber));
 			}
 		}
-		else
-		{
-			throw runtime_error("Expected a label or op code at line " + to_string(lineNumber));
-		}		
 	}
 
 	#ifdef DEBUG
