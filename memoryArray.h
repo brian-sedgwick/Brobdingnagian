@@ -49,10 +49,6 @@ public:
 
 	void writeInt(size_t location, int data)
 	{
-		#ifdef DEBUG
-			cout << "memoryArray.writeInt() -> Location: " << location << " Value: " << data << endl;
-		#endif
-
 		if(indexOutOfBounds(location) || indexOutOfBounds(location + sizeof(int) - 1))
 		{
 			throw out_of_range("Invalid index to write an int: " + to_string(location));
@@ -62,10 +58,6 @@ public:
 
 	void writeChar(size_t location, char data)
 	{
-		#ifdef DEBUG
-			cout << "memoryArray.writeChar() -> Location: " << location << " Value: " << data << endl;
-		#endif
-			
 		if(indexOutOfBounds(location))
 		{
 			throw out_of_range("Invalid index to write a char: " + to_string(location));

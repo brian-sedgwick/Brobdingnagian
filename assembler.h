@@ -3,6 +3,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <vector>
 #include "memoryArray.h"
 
 class assembler
@@ -13,8 +14,8 @@ public:
 
 	std::unordered_map<std::string, int> opCodeTable;
 	std::unordered_map<std::string, int> directivesTable;	
-	std::unordered_map<std::string, int> registerTable;	
-	std::unordered_map<int, std::string> symbolTypeTable;
+	std::unordered_map<std::string, int> registerTable;
+	
 	assembler(std::string filename, memoryArray* mem): assemblyFileName(filename)
 	{
 		memory = mem;
@@ -50,6 +51,10 @@ public:
 			{ "AND", 18 },
 			{ "OR",  19 },
 			{ "CMP", 20 },
+			{ "STRI", 21 },
+			{ "LDRI", 22 },
+			{ "STBI", 23 },
+			{ "LDBI", 24 },
 		};
 
 		// Register Name -> Register index
@@ -67,19 +72,21 @@ public:
 	}
 	
 	int start();
-
 private:
 	int codeBlockBeginning = -1;
+	int lineNumber = 0;
 	memoryArray* memory;
-
 	std::string assemblyFileName;
 	std::unordered_map<std::string, int> symbolTable;
-	
+	std::vector<std::string> opCodesForIndirectAddr;
+
 	void firstPassAssembler();
 	void secondPassAssembler();
-	void writeDirectiveToMemory(string token, int value, int memoryLocation);
+	void writeDirectiveToMemory(std::string token, int value, int memoryLocation);
 	void writeOpCodeToMemory(int opCodeValue, int op1Value, int op2Value, int startingLocation);
-	int parseOperand(string operand);
+	int parseOperand(std::string operand, std::string opcode, bool isSecondOperand, int memoryLocation);
+	int convertToASCII(std::string value);
+	bool hasIndirectSyntax(std::string line);
 	std::string stripComments(std::string);
 	std::string trim(std::string);
 };

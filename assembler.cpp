@@ -2,6 +2,8 @@
 #include <exception>
 #include <fstream>
 #include <sstream>
+#include <regex>
+#include <vector>
 #include "assembler.h"
 using namespace std;
 
@@ -18,7 +20,7 @@ void assembler::firstPassAssembler()
 	ifstream f(assemblyFileName, ios::in);
 	string input;
 
-	int lineNumber = 0;
+	lineNumber = 0;
 	int memoryLocation = 0;
 	while(getline(f, input))
 	{
@@ -67,10 +69,10 @@ void assembler::firstPassAssembler()
 			{
 				memoryLocation += directivesTable[token2];
 			}
-			// The line was a syntax error.
+			// The line was a labeled opCode with a label as the second argument.
 			else
 			{
-				throw runtime_error("Expected a directive or op code after label on line " + to_string(lineNumber));
+				memoryLocation += INSTRUCTION_SIZE;
 			}
 		}
 	}
@@ -90,7 +92,7 @@ void assembler::secondPassAssembler()
 	fstream f(assemblyFileName, ios::in);
 	string input;
 
-	int lineNumber = 0;
+	lineNumber = 0;
 	int memoryLocation = 0;
 
 	while(getline(f, input))
@@ -113,16 +115,24 @@ void assembler::secondPassAssembler()
 		
 		if(symbolTable.find(token) != symbolTable.end())// The token is a label. Discard.
 		{ 
-			if(!(ss >> token)) { throw runtime_error(""); }
-		} 
+			if(!(ss >> token)) { throw runtime_error("Labels must accompany a valid line of code: " + to_string(lineNumber)); }
+		}
+
+		if(hasIndirectSyntax(input)) // There were parens found indicating indirect addressing.
+		{
+			token += "I";
+		}
+
 		if(directivesTable.find(token) != directivesTable.end())// The token is a directive.
 		{
-			int value;
+			string value;
 			ss >> value;
-			writeDirectiveToMemory(token, value, memoryLocation);
+
+			int asciiVal = convertToASCII(value);
+			writeDirectiveToMemory(token, asciiVal, memoryLocation);
 			memoryLocation += directivesTable[token];
 		}
-		else if(opCodeTable.find(token) != opCodeTable.end()) // The token is a directive.
+		else if(opCodeTable.find(token) != opCodeTable.end()) // The token is an opCode.
 		{
 			// Set the location of the Code Block.
 			if(codeBlockBeginning == -1)
@@ -143,7 +153,7 @@ void assembler::secondPassAssembler()
 			}
 			else
 			{
-				operand1_value = parseOperand(operand1);
+				operand1_value = parseOperand(operand1, token, false, memoryLocation);
 			}
 
 			if(!(ss >> operand2))
@@ -152,18 +162,17 @@ void assembler::secondPassAssembler()
 			}
 			else
 			{
-				operand2_value = parseOperand(operand2);
+				operand2_value = parseOperand(operand2, token, true, memoryLocation);
 			}
 			writeOpCodeToMemory(opCodeTable[token], operand1_value, operand2_value, memoryLocation);
 			memoryLocation += INSTRUCTION_SIZE;
 		}
-		else { throw runtime_error("Unexpected token: " + token); }
+		else { throw runtime_error("Unexpected token: " + token + " " + to_string(lineNumber)); }
 	}
 }
 
 void assembler::writeDirectiveToMemory(string directive, int value, int location)
 {
-	symbolTypeTable.insert({location, directive});
 	if(directive == ".INT")
 	{
 		memory->writeInt(location, value);
@@ -183,8 +192,19 @@ void assembler::writeOpCodeToMemory(int opCodeVal, int op1Val, int op2Val, int s
 	memory->writeInt(startingLocation, op2Val);
 }
 
-int assembler::parseOperand(string operand)
+int assembler::parseOperand(string operand, string opcode, bool isSecondOperand, int startingLocation)
 {
+	string pattern("[:space:]*\\(([:space:]*R[0-7][:space:]*)\\)[:space:]*");
+	regex r(pattern);
+	smatch results;
+	if(regex_search(operand, results, r))
+	{
+		if(!isSecondOperand)
+		{
+			throw runtime_error("Register Indirect Addressing is not allowed on the first operand!: " + to_string(lineNumber));
+		}
+		return registerTable[results[1]];
+	}
 	if(registerTable.find(operand) != registerTable.end())
 	{
 		return registerTable[operand];
@@ -197,11 +217,58 @@ int assembler::parseOperand(string operand)
 }
 
 string assembler::stripComments(string input)
-{
+{	
 	return input.substr(0, input.find_first_of(';'));
 }
 
 string assembler::trim(string input)
 {
-	return input.substr(input.find_first_not_of(" \t\n"), input.find_last_not_of(" \t\n") + 1);
+	string pattern("^\\s*(.*)\\s*$");
+	regex r(pattern);
+	smatch results;
+	if(regex_search(input, results, r))
+	{
+		return results[1];
+	}
+	return "";
+}
+
+int assembler::convertToASCII(string value)
+{
+	string pattern = "^'(.*)'$";
+	regex r(pattern);
+	smatch results;
+
+	int resultValue = -1;
+	if(value == "'\\n'")
+	{
+		resultValue = 10;
+	}
+	else if(value == "'")
+	{
+		resultValue = 32;
+	}
+	else if(regex_search(value, results, r)) // The value is a single-quoted ascii character.
+	{
+		resultValue = static_cast<int>(results[1].str()[0]);
+	}
+	else // Assume the value is simply an ascii code.
+	{
+		stringstream ss(value);
+		ss >> resultValue;
+	}
+
+	return resultValue;
+}
+
+bool assembler::hasIndirectSyntax(std::string line)
+{
+	string pattern("^[^()]*\\([^()]+\\)[^()]*$"); // Matches exactly one '(' and one ')' in a line.
+	regex r(pattern);
+	smatch result;
+	if(regex_search(line, result, r))
+	{
+		return true;
+	}
+	return false;
 }

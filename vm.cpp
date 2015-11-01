@@ -26,13 +26,6 @@ void vm::setupEnvironment()
 
 void vm::fetch()
 {
-	#ifdef DEBUG
-		cout << "Fetching Instruction from location: " 
-			<< reg[Register::PC] << "," 
-			<< reg[Register::PC] + assembler::OPERAND_SIZE << ","
-			<< reg[Register::PC] + (assembler::OPERAND_SIZE * 2) << endl;
-	#endif
-
 	IR.opCode = memory.readInt(reg[Register::PC]);
 	IR.op1 = memory.readInt(reg[Register::PC] + assembler::OPERAND_SIZE);
 	IR.op2 = memory.readInt(reg[Register::PC] + (assembler::OPERAND_SIZE * 2));
@@ -41,13 +34,6 @@ void vm::fetch()
 
 void vm::decodeAndExecute()
 {
-	#ifdef DEBUG
-		cout << "Decode and execute: " 
-			<< IR.opCode << " " 
-			<< IR.op1 << " " 
-			<< IR.op2 << endl;
-	#endif
-
 	switch( IR.opCode )
 	{
 		case opCode::TRP :
@@ -177,43 +163,45 @@ void vm::decodeAndExecute()
 			break;
 		}
 
+		case opCode::STRI:
+		{
+			memory.writeInt(reg[IR.op2], reg[IR.op1]);
+			break;
+		}
+
 		case opCode::STR :
 		{
-			if( twoPassAssembler.symbolTypeTable[IR.op2] == ".INT" )
-			{
-				memory.writeInt(IR.op2, reg[IR.op1]);
-			}
-			else if( twoPassAssembler.symbolTypeTable[IR.op2] == ".BYT" )
-			{
-				memory.writeChar(IR.op2, reg[IR.op1]);
-			}
-			else
-			{
-				throw runtime_error("Unexpected directive on decode: " + twoPassAssembler.symbolTypeTable[IR.op2] );
-			}
+			memory.writeInt(IR.op2, reg[IR.op1]);
+			break;
+		}
+
+		case opCode::LDRI:
+		{
+			reg[IR.op1] = memory.readInt(reg[IR.op2]);
 			break;
 		}
 
 		case opCode::LDR :
 		{
-			if( twoPassAssembler.symbolTypeTable[IR.op2] == ".INT" )
-			{
-				reg[IR.op1] = memory.readInt(IR.op2);
-			}
-			else if( twoPassAssembler.symbolTypeTable[IR.op2] == ".BYT" )
-			{
-				reg[IR.op1] = memory.readChar(IR.op2);
-			}
-			else
-			{
-				throw runtime_error("Unexpected directive on decode: " + twoPassAssembler.symbolTypeTable[IR.op2] );
-			}
+			reg[IR.op1] = memory.readInt(IR.op2);
+			break;
+		}
+
+		case opCode::STBI:
+		{
+			memory.writeChar(reg[IR.op2], reg[IR.op1]);
 			break;
 		}
 
 		case opCode::STB :
 		{
 			memory.writeChar(IR.op2, reg[IR.op1]);
+			break;
+		}
+
+		case opCode::LDBI:
+		{
+			reg[IR.op1] = memory.readChar(reg[IR.op2]);
 			break;
 		}
 
@@ -268,8 +256,8 @@ void vm::decodeAndExecute()
 		case opCode::CMP :
 		{
 			if(reg[IR.op1] == reg[IR.op2]){ reg[IR.op1] = 0; }
-			if(reg[IR.op1] > reg[IR.op2]){ reg[IR.op1] = 1; }
-			if(reg[IR.op1] < reg[IR.op2]){ reg[IR.op1] = -1; }
+			else if(reg[IR.op1] > reg[IR.op2]){ reg[IR.op1] = 1; }
+			else if(reg[IR.op1] < reg[IR.op2]){ reg[IR.op1] = -1; }
 			break;
 		}
 

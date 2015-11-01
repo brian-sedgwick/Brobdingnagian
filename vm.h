@@ -7,11 +7,20 @@
 #include "memoryArray.h"
 
 
+enum AddressingMode { DIRECT=0, INDIRECT=1 };
 struct Instruction
 {
 	int opCode;
 	int op1;
 	int op2;
+	AddressingMode mode;
+
+	Instruction()
+	{
+		opCode = 0;
+		op1 = 0;
+		op2 = 0;
+	}
 };
 
 class vm
@@ -39,7 +48,11 @@ public:
 		DIV=17,
 		AND=18,
 		OR=19,
-		CMP=20
+		CMP=20,
+		STRI=21,
+		LDRI=22,
+		STBI=23,
+		LDBI=24
 	};
 
 	vm(std::string filename) :
