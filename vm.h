@@ -26,7 +26,22 @@ struct Instruction
 class vm
 {
 public:
-	enum Register { R0=0, R1=1, R2=2, R3=3, R4=4, R5=5, R6=6, R7=7, PC=8 };
+	enum Register { 
+		R0=0, 
+		R1=1, 
+		R2=2, 
+		R3=3, 
+		R4=4, 
+		R5=5, 
+		R6=6, 
+		R7=7, 
+		PC=8, 
+		SL=9,
+		SP=10,
+		FP=11,
+		SB=12 
+	};
+
 	enum opCode { 
 		TRP=0,
 		JMP=1,
@@ -61,14 +76,16 @@ public:
 		twoPassAssembler(filename, &memory)		
 	{}
 	void Run();
-private:
 
+private:
+	const size_t MEMORY_SIZE = 1000000;
 	bool EndOfProgram;
 	Instruction IR;
 	int codeBlockLocation;
-	int reg[9]{0};
+	int codeBlockEndLocation;
+	int reg[13]{0};
 	std::string filename;
-	memoryArray memory;
+	memoryArray memory{ MEMORY_SIZE };
 	assembler twoPassAssembler;
 
 	void setupEnvironment();

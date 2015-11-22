@@ -8,11 +8,12 @@
 using namespace std;
 
 
-int assembler::start()
+void assembler::start(int& codeStart, int& codeEnd)
 {
 	firstPassAssembler();
 	secondPassAssembler();
-	return codeBlockBeginning;
+	codeStart = codeBlockBeginning;
+	codeEnd = codeBlockEnding;
 }
 
 void assembler::firstPassAssembler()
@@ -83,7 +84,7 @@ void assembler::firstPassAssembler()
 		{
 			cout << entry.first << " " << entry.second << "\n";
 		}
-		cout << "END Symbol Table Contents" << endl;
+		cout << endl << "END Symbol Table Contents" << endl << endl;
 	#endif
 }
 
@@ -109,9 +110,6 @@ void assembler::secondPassAssembler()
 		string token;
 		ss >> token;
 
-		#ifdef DEBUG
-			cout << "Loading line: " << input << endl;
-		#endif
 		
 		if(symbolTable.find(token) != symbolTable.end())// The token is a label. Discard.
 		{ 
@@ -125,6 +123,10 @@ void assembler::secondPassAssembler()
 
 		if(directivesTable.find(token) != directivesTable.end())// The token is a directive.
 		{
+			#ifdef DEBUG
+				cout << "Loading line(Mem:" << memoryLocation << "): " << input << endl;
+			#endif
+		
 			string value;
 			ss >> value;
 
@@ -139,9 +141,14 @@ void assembler::secondPassAssembler()
 			{ 
 				codeBlockBeginning = memoryLocation;
 				#ifdef DEBUG
-					cout << "Beginning of Code Block: " << codeBlockBeginning << endl;
+					cout << endl << "Beginning of Code Block: " << codeBlockBeginning << endl << endl;
 				#endif
 			}
+			
+			#ifdef DEBUG
+				cout << "Loading line(Mem:" << memoryLocation << "): " << input << endl;
+			#endif
+		
 			string operand1;
 			string operand2;
 			int operand1_value;
@@ -167,8 +174,18 @@ void assembler::secondPassAssembler()
 			writeOpCodeToMemory(opCodeTable[token], operand1_value, operand2_value, memoryLocation);
 			memoryLocation += INSTRUCTION_SIZE;
 		}
-		else { throw runtime_error("Unexpected token: " + token + " " + to_string(lineNumber)); }
+		else 
+		{ 
+			#ifdef DEBUG
+				cout << "Loading line(Mem:" << memoryLocation << "): " << input << endl;
+			#endif
+			throw runtime_error("Unexpected token: " + token + " " + to_string(lineNumber)); 
+		}
 	}
+	codeBlockEnding = memoryLocation;
+	#ifdef DEBUG
+		cout << endl << "Ending of Code Block: " << codeBlockEnding << endl << endl;
+	#endif
 }
 
 void assembler::writeDirectiveToMemory(string directive, int value, int location)
@@ -194,7 +211,7 @@ void assembler::writeOpCodeToMemory(int opCodeVal, int op1Val, int op2Val, int s
 
 int assembler::parseOperand(string operand, string opcode, bool isSecondOperand, int startingLocation)
 {
-	string pattern("[:space:]*\\(([:space:]*R[0-7][:space:]*)\\)[:space:]*");
+	string pattern("[:space:]*\\(([:space:]*(R[0-7]|SP|FP|SL|SB)[:space:]*)\\)[:space:]*");
 	regex r(pattern);
 	smatch results;
 	if(regex_search(operand, results, r))

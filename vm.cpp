@@ -6,7 +6,7 @@ using namespace std;
 
 void vm::Run()
 {
-	codeBlockLocation = twoPassAssembler.start();
+	twoPassAssembler.start(codeBlockLocation, codeBlockEndLocation);
 	setupEnvironment();
 	while(!EndOfProgram)
 	{
@@ -22,6 +22,9 @@ void vm::setupEnvironment()
 		throw runtime_error("There was apparently no executable code in the assembly file!");
 	}
 	reg[Register::PC] = codeBlockLocation;
+	reg[Register::SL] = codeBlockEndLocation;
+	reg[Register::SB] = reg[Register::SP] = reg[Register::FP] = MEMORY_SIZE - 4;
+
 }
 
 void vm::fetch()
@@ -52,7 +55,9 @@ void vm::decodeAndExecute()
 				}
 				case 2:
 				{
-					// Implement later.
+					int input;
+					cin >> input;
+					reg[Register::R3] = input;
 					break;
 				}
 				case 3:
@@ -62,17 +67,32 @@ void vm::decodeAndExecute()
 				}
 				case 4:
 				{
-					// Implement later.
+					reg[Register::R3] = getchar();
 					break;
 				}
 				case 10:
 				{
-					// Implement later.
+					if(char(reg[Register::R3]) < '0' || char(reg[Register::R3]) > '9')
+					{
+						reg[Register::R3] = -1;
+					}
+					else
+					{
+						reg[Register::R3] = int(char(reg[Register::R3]));
+					}
 					break;
 				}
 				case 11:
 				{
-					// Implement later.
+					if(reg[Register::R3] < 0 || reg[Register::R3] > 9)
+					{
+						reg[Register::R3] = -1;
+					}
+					else
+					{
+						reg[Register::R3] = char(reg[Register::R3]);
+					}
+					
 					break;
 				}
 			#ifdef DEBUG
@@ -87,7 +107,11 @@ void vm::decodeAndExecute()
 						 << reg[Register::R5] << "," 
 						 << reg[Register::R6] << "," 
 						 << reg[Register::R7] << " } "
-						 << "PC->{ " << reg[Register::PC] << " }" << endl; 
+						 << "PC->{ " << reg[Register::PC] << " } "
+						 << "SL->{ " << reg[Register::SL] << " } "
+						 << "SP->{ " << reg[Register::SP] << " } "
+						 << "FP->{ " << reg[Register::FP] << " } "
+						 << "SB->{ " << reg[Register::SB] << " } " << endl;
 					break;
 				}
 			#endif
@@ -113,9 +137,9 @@ void vm::decodeAndExecute()
 
 		case opCode::BNZ :
 		{
-			if(reg[IR.op1] != 0)
+			if(reg[Register::R3] != 0)
 			{
-				reg[Register::PC] = IR.op2;
+				reg[Register::PC] = IR.op1;
 			}
 			break;
 		}

@@ -67,13 +67,19 @@ public:
 			{ "R4", 4 },
 			{ "R5", 5 },
 			{ "R6", 6 },
-			{ "R7", 7 }
+			{ "R7", 7 },
+			{ "PC", 8 },
+			{ "SL", 9 },
+			{ "SP", 10 },
+			{ "FP", 11 },
+			{ "SB", 12 },
 		};
 	}
 	
-	int start();
+	void start(int& codeStart, int& codeEnd);
 private:
 	int codeBlockBeginning = -1;
+	int codeBlockEnding = -1;
 	int lineNumber = 0;
 	memoryArray* memory;
 	std::string assemblyFileName;

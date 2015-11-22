@@ -9,19 +9,20 @@ using namespace std;
 class memoryArray
 {
 private:
-	static const size_t MEM_SIZE = 1000000;
+	size_t mem_size;
 	char* memory;
 
 	bool indexOutOfBounds(size_t memoryLocation)
 	{
-		if(memoryLocation >= MEM_SIZE){ return true; }
+		if(memoryLocation >= mem_size){ return true; }
 		return false;
 	}
 
 public:
-	memoryArray()
+	memoryArray(size_t size)
 	{
-		memory = new char[MEM_SIZE]{0};
+		mem_size = size;
+		memory = new char[mem_size]{0};
 	}
 	
 	~memoryArray()
