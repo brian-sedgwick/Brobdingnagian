@@ -91,6 +91,7 @@ private:
 	void setupEnvironment();
 	void fetch();
 	void decodeAndExecute();
+
 };
 
 #endif

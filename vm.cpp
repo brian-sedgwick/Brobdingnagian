@@ -32,7 +32,11 @@ void vm::fetch()
 	IR.opCode = memory.readInt(reg[Register::PC]);
 	IR.op1 = memory.readInt(reg[Register::PC] + assembler::OPERAND_SIZE);
 	IR.op2 = memory.readInt(reg[Register::PC] + (assembler::OPERAND_SIZE * 2));
+	#ifdef DEBUG
+		cout << "IF[PC=" << reg[Register::PC] << "]: " << IR.opCode << " " << IR.op1 << " " << IR.op2 << endl;
+	#endif
 	reg[Register::PC] += assembler::INSTRUCTION_SIZE;
+
 }
 
 void vm::decodeAndExecute()
@@ -137,9 +141,9 @@ void vm::decodeAndExecute()
 
 		case opCode::BNZ :
 		{
-			if(reg[Register::R3] != 0)
+			if(reg[IR.op1] != 0)
 			{
-				reg[Register::PC] = IR.op1;
+				reg[Register::PC] = IR.op2;
 			}
 			break;
 		}
