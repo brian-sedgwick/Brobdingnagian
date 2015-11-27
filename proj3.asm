@@ -129,7 +129,8 @@ FUNC_OPD LDR R7 SPACE_FOR_FUNC_OPD_LOCALS
 
 	;If statement, .BYT input equals test.
 	MOV R0 R6 			;Load first op.
-	LDR R3 zero		 	;Load second op.
+	LDB R3 zero		 	;Load second op.
+	TRP 99
 	IF1		CMP R3 R0
 			TRP 99
 			BNZ R3 ELSE_1  ;USE BNZ for isEqual check.
@@ -141,7 +142,8 @@ FUNC_OPD LDR R7 SPACE_FOR_FUNC_OPD_LOCALS
 			JMP END
 	;Result false.
 	ELSE_1	MOV R0 R6 			;Load first op.
-		LDR R3 one		 	;Load second op.
+		LDB R3 one		 	;Load second op.
+		TRP 99
 		IF2		CMP R3 R0
 				TRP 99
 				BNZ R3 ELSE_2  ;USE BNZ for isEqual check.
@@ -149,11 +151,12 @@ FUNC_OPD LDR R7 SPACE_FOR_FUNC_OPD_LOCALS
 				ADI R7 1
 				MOV R0 FP
 				ADI R0 -20
+				TRP 99
 				STR R7 (R0) ; store t in memory.
 				JMP END
 		;Result false.
 		ELSE_2	MOV R0 R6 			;Load first op.
-			LDR R3 two		 	;Load second op.
+			LDB R3 two		 	;Load second op.
 			IF3		CMP R3 R0
 					TRP 99
 					BNZ R3 ELSE_3  ;USE BNZ for isEqual check.
@@ -165,7 +168,7 @@ FUNC_OPD LDR R7 SPACE_FOR_FUNC_OPD_LOCALS
 					JMP END
 			;Result false.
 			ELSE_3	MOV R0 R6 			;Load first op.
-				LDR R3 three		 	;Load second op.
+				LDB R3 three		 	;Load second op.
 				IF4		CMP R3 R0
 						TRP 99
 						BNZ R3 ELSE_4  ;USE BNZ for isEqual check.
@@ -177,7 +180,7 @@ FUNC_OPD LDR R7 SPACE_FOR_FUNC_OPD_LOCALS
 						JMP END
 				;Result false.
 				ELSE_4	MOV R0 R6 			;Load first op.
-					LDR R3 four		 	;Load second op.
+					LDB R3 four		 	;Load second op.
 					IF5		CMP R3 R0
 							TRP 99
 							BNZ R3 ELSE_5  ;USE BNZ for isEqual check.
@@ -189,7 +192,7 @@ FUNC_OPD LDR R7 SPACE_FOR_FUNC_OPD_LOCALS
 							JMP END
 					;Result false.
 					ELSE_5	MOV R0 R6 			;Load first op.
-						LDR R3 five		 	;Load second op.
+						LDB R3 five		 	;Load second op.
 						IF6		CMP R3 R0
 								TRP 99
 								BNZ R3 ELSE_6  ;USE BNZ for isEqual check.
@@ -201,7 +204,7 @@ FUNC_OPD LDR R7 SPACE_FOR_FUNC_OPD_LOCALS
 								JMP END
 						;Result false.
 						ELSE_6	MOV R0 R6 			;Load first op.
-							LDR R3 six		 	;Load second op.
+							LDB R3 six		 	;Load second op.
 							IF7		CMP R3 R0
 									TRP 99
 									BNZ R3 ELSE_7  ;USE BNZ for isEqual check.
@@ -213,7 +216,7 @@ FUNC_OPD LDR R7 SPACE_FOR_FUNC_OPD_LOCALS
 									JMP END
 							;Result false.
 							ELSE_7	MOV R0 R6 			;Load first op.
-								LDR R3 seven		 	;Load second op.
+								LDB R3 seven		 	;Load second op.
 								IF8		CMP R3 R0
 										TRP 99
 										BNZ R3 ELSE_8  ;USE BNZ for isEqual check.
@@ -225,7 +228,7 @@ FUNC_OPD LDR R7 SPACE_FOR_FUNC_OPD_LOCALS
 										JMP END
 								;Result false.
 								ELSE_8	MOV R0 R6 			;Load first op.
-									LDR R3 eight		 	;Load second op.
+									LDB R3 eight		 	;Load second op.
 									IF9		CMP R3 R0
 											TRP 99
 											BNZ R3 ELSE_9  ;USE BNZ for isEqual check.
@@ -237,7 +240,7 @@ FUNC_OPD LDR R7 SPACE_FOR_FUNC_OPD_LOCALS
 											JMP END
 									;Result false.
 									ELSE_9	MOV R0 R6 			;Load first op.
-										LDR R3 nine		 	;Load second op.
+										LDB R3 nine		 	;Load second op.
 										IF10	CMP R3 R0
 												TRP 99
 												BNZ R3 ELSE_10  ;USE BNZ for isEqual check.
@@ -291,7 +294,7 @@ FUNC_OPD LDR R7 SPACE_FOR_FUNC_OPD_LOCALS
 											STR R0 flag
 										;End of If-statement.
 	END LDR R3 flag 	;Load first op.
-	IF11	BRZ R3 ELSE11 	;USE BRZ for not check.
+	IF11	BNZ R3 ELSE11 	;USE BNZ for not check.
 			
 			MOV R0 R4 			;Load first op.
 			LDB R3 plus			;Load second op.

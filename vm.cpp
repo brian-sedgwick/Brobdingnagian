@@ -2,6 +2,10 @@
 #include <string>
 #include "vm.h"
 
+#ifdef BRIAN_DEBUG
+	#include "easylogging++.h"
+#endif
+
 using namespace std;
 
 void vm::Run()
@@ -32,8 +36,8 @@ void vm::fetch()
 	IR.opCode = memory.readInt(reg[Register::PC]);
 	IR.op1 = memory.readInt(reg[Register::PC] + assembler::OPERAND_SIZE);
 	IR.op2 = memory.readInt(reg[Register::PC] + (assembler::OPERAND_SIZE * 2));
-	#ifdef DEBUG
-		cout << "IF[PC=" << reg[Register::PC] << "]: " << IR.opCode << " " << IR.op1 << " " << IR.op2 << endl;
+	#ifdef BRIAN_DEBUG
+		LOG(DEBUG) << "IF[PC=" << reg[Register::PC] << "]: " << IR.opCode << " " << IR.op1 << " " << IR.op2;
 	#endif
 	reg[Register::PC] += assembler::INSTRUCTION_SIZE;
 
@@ -99,10 +103,10 @@ void vm::decodeAndExecute()
 					
 					break;
 				}
-			#ifdef DEBUG
+			#ifdef BRIAN_DEBUG
 				case 99:
 				{
-					cout << "DEBUG: Registers->{ " 
+					LOG(DEBUG)  << "Registers->{ " 
 						 << reg[Register::R0] << "," 
 						 << reg[Register::R1] << "," 
 						 << reg[Register::R2] << "," 
@@ -115,7 +119,7 @@ void vm::decodeAndExecute()
 						 << "SL->{ " << reg[Register::SL] << " } "
 						 << "SP->{ " << reg[Register::SP] << " } "
 						 << "FP->{ " << reg[Register::FP] << " } "
-						 << "SB->{ " << reg[Register::SB] << " } " << endl;
+						 << "SB->{ " << reg[Register::SB] << " } ";
 					break;
 				}
 			#endif

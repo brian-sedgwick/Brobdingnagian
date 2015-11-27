@@ -5,8 +5,12 @@
 #include <regex>
 #include <vector>
 #include "assembler.h"
-using namespace std;
 
+#ifdef BRIAN_DEBUG
+	#include "easylogging++.h"
+#endif
+
+using namespace std;
 
 void assembler::start(int& codeStart, int& codeEnd)
 {
@@ -78,13 +82,13 @@ void assembler::firstPassAssembler()
 		}
 	}
 
-	#ifdef DEBUG
-		cout << "Symbol Table Contents:" << endl;
+	#ifdef BRIAN_DEBUG
+		LOG(DEBUG)  << "Symbol Table Contents:";
 		for( auto entry : symbolTable)
 		{
-			cout << entry.first << " " << entry.second << "\n";
+			LOG(DEBUG)  << entry.first << " " << entry.second;
 		}
-		cout << endl << "END Symbol Table Contents" << endl << endl;
+		LOG(DEBUG) << "END Symbol Table Contents";
 	#endif
 }
 
@@ -123,8 +127,8 @@ void assembler::secondPassAssembler()
 
 		if(directivesTable.find(token) != directivesTable.end())// The token is a directive.
 		{
-			#ifdef DEBUG
-				cout << "Loading line(Mem:" << memoryLocation << "): " << input << endl;
+			#ifdef BRIAN_DEBUG
+				LOG(DEBUG) << "Loading line(Mem:" << memoryLocation << "): " << input;
 			#endif
 		
 			string value;
@@ -140,13 +144,13 @@ void assembler::secondPassAssembler()
 			if(codeBlockBeginning == -1)
 			{ 
 				codeBlockBeginning = memoryLocation;
-				#ifdef DEBUG
-					cout << endl << "Beginning of Code Block: " << codeBlockBeginning << endl << endl;
+				#ifdef BRIAN_DEBUG
+					LOG(DEBUG) << "Beginning of Code Block: " << codeBlockBeginning;
 				#endif
 			}
 			
-			#ifdef DEBUG
-				cout << "Loading line(Mem:" << memoryLocation << "): " << input << endl;
+			#ifdef BRIAN_DEBUG
+				LOG(DEBUG) << "Loading line(Mem:" << memoryLocation << "): " << input;
 			#endif
 		
 			string operand1;
@@ -176,15 +180,15 @@ void assembler::secondPassAssembler()
 		}
 		else 
 		{ 
-			#ifdef DEBUG
-				cout << "Loading line(Mem:" << memoryLocation << "): " << input << endl;
+			#ifdef BRIAN_DEBUG
+				LOG(DEBUG) << "Loading line(Mem:" << memoryLocation << "): " << input;
 			#endif
 			throw runtime_error("Unexpected token: " + token + " " + to_string(lineNumber)); 
 		}
 	}
 	codeBlockEnding = memoryLocation;
-	#ifdef DEBUG
-		cout << endl << "Ending of Code Block: " << codeBlockEnding << endl << endl;
+	#ifdef BRIAN_DEBUG
+		LOG(DEBUG) << "Ending of Code Block: " << codeBlockEnding;
 	#endif
 }
 
