@@ -12,12 +12,14 @@
 
 using namespace std;
 
-void assembler::start(int& codeStart, int& codeEnd)
+void assembler::start(int& codeStart, int& codeEnd, std::unordered_map<std::string, int>& symbolT,std::unordered_map<int, std::string>& symbolLT)
 {
 	firstPassAssembler();
 	secondPassAssembler();
 	codeStart = codeBlockBeginning;
 	codeEnd = codeBlockEnding;
+	symbolT = symbolTable;
+	symbolLT = symbolLocationTable;
 }
 
 void assembler::firstPassAssembler()
@@ -61,9 +63,11 @@ void assembler::firstPassAssembler()
 			{
 				throw runtime_error("Duplicate label encountered!: " + to_string(lineNumber));
 			}
-
+			
 			// Add the symbol and then determine how much space it takes in memory.
 			symbolTable.insert({token, memoryLocation});
+			symbolLocationTable.insert({memoryLocation, token});
+
 			// The line was a labeled instruction.
 			if(opCodeTable.find(token2) != opCodeTable.end())
 			{

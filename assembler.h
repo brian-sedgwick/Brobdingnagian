@@ -76,7 +76,7 @@ public:
 		};
 	}
 	
-	void start(int& codeStart, int& codeEnd);
+	void start(int& codeStart, int& codeEnd, std::unordered_map<std::string, int>& symbolTable, std::unordered_map<int, std::string>& symbolLocationTable);
 private:
 	int codeBlockBeginning = -1;
 	int codeBlockEnding = -1;
@@ -84,6 +84,7 @@ private:
 	memoryArray* memory;
 	std::string assemblyFileName;
 	std::unordered_map<std::string, int> symbolTable;
+	std::unordered_map<int, std::string> symbolLocationTable;
 	std::vector<std::string> opCodesForIndirectAddr;
 
 	void firstPassAssembler();

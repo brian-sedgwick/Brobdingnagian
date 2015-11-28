@@ -87,6 +87,8 @@ private:
 	std::string filename;
 	memoryArray memory{ MEMORY_SIZE };
 	assembler twoPassAssembler;
+	std::unordered_map<std::string, int> symbolTable;
+	std::unordered_map<int, std::string> symbolLocationTable;
 
 	void setupEnvironment();
 	void fetch();

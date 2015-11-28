@@ -18,6 +18,8 @@ int main(int argc, char** argv)
 	#ifdef BRIAN_DEBUG
 		Configurations conf("logging.conf");
 		Loggers::reconfigureAllLoggers(conf);
+		Loggers::addFlag(LoggingFlag::ImmediateFlush);
+		Loggers::addFlag(LoggingFlag::ColoredTerminalOutput);
 		LOG(DEBUG) << "===================================================";
 		LOG(DEBUG) << "                    Starting VM                    ";
 		LOG(DEBUG) << "===================================================";

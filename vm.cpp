@@ -10,7 +10,7 @@ using namespace std;
 
 void vm::Run()
 {
-	twoPassAssembler.start(codeBlockLocation, codeBlockEndLocation);
+	twoPassAssembler.start(codeBlockLocation, codeBlockEndLocation, symbolTable, symbolLocationTable);
 	setupEnvironment();
 	while(!EndOfProgram)
 	{
@@ -104,6 +104,29 @@ void vm::decodeAndExecute()
 					break;
 				}
 			#ifdef BRIAN_DEBUG
+				case 98:
+				{
+					LOG(DEBUG) << "=============== DATA SEGMENT ===============";
+
+					int previousMemLoc = 0;
+					for(int i = 1; i <= codeBlockLocation; i++)
+					{
+						if(symbolLocationTable.find(i) != symbolLocationTable.end())
+						{
+							if(i - previousMemLoc == 4)// INT
+							{
+								LOG(DEBUG) << "[ " << symbolLocationTable[previousMemLoc] << " ](INT): " << memory.readInt(previousMemLoc);
+							}
+							else // BYT
+							{
+								LOG(DEBUG) << "[ " << symbolLocationTable[previousMemLoc] << " ](BYT): " << memory.readChar(previousMemLoc); 
+							}
+							previousMemLoc = i;
+						}
+					}
+					LOG(DEBUG) << "============= END DATA SEGMENT =============";
+					break;
+				}
 				case 99:
 				{
 					LOG(DEBUG)  << "Registers->{ " 
