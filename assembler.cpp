@@ -163,8 +163,15 @@ void assembler::secondPassAssembler()
 			int operand2_value;
 
 			if(!(ss >> operand1))
-			{ 
-				throw runtime_error("Insufficient number of operands on line " + to_string(lineNumber));
+			{
+				if(token == "END" || token == "BLK")
+				{
+					operand1_value = 0;
+				}
+				else
+				{
+					throw runtime_error("Insufficient number of operands on line " + to_string(lineNumber));
+				}
 			}
 			else
 			{

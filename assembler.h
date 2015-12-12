@@ -55,6 +55,11 @@ public:
 			{ "LDRI", 22 },
 			{ "STBI", 23 },
 			{ "LDBI", 24 },
+			{ "RUN", 25 },
+			{ "END", 26 },
+			{ "BLK", 27 },
+			{ "LCK", 28 },
+			{ "ULK", 29 },
 		};
 
 		// Register Name -> Register index
