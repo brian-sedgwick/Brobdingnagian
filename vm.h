@@ -84,8 +84,8 @@ public:
 	void Run();
 
 private:
-	const size_t MEMORY_SIZE = 1000000;
-	const static size_t AVAILABLE_THREADS = 5; // 1 main thread + 4 secondary threads.
+	const size_t MEMORY_SIZE = 10000000;
+	const static size_t AVAILABLE_THREADS = 1; // 1 main thread + 4 secondary threads.
 	const int THREAD_STACK_OFFSET_PC = 0;
 	const int THREAD_STACK_OFFSET_R0 = -4;
 	const int THREAD_STACK_OFFSET_R1 = -8;

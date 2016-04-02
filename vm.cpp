@@ -19,6 +19,7 @@ void vm::Run()
 		decodeAndExecute();
 		contextSwitch();
 	}
+	cout << endl;
 }
 
 void vm::setupEnvironment()
