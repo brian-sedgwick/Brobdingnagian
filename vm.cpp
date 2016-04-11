@@ -237,6 +237,9 @@ void vm::decodeAndExecute()
 
 		case opCode::STRI:
 		{
+			#ifdef BRIAN_DEBUG
+				LOG(DEBUG) << "STRI: MEM[" << reg[IR.op2] << "] = " << reg[IR.op1];
+			#endif
 			memory.writeInt(reg[IR.op2], reg[IR.op1]);
 			break;
 		}
@@ -250,7 +253,7 @@ void vm::decodeAndExecute()
 		case opCode::LDRI:
 		{
 			#ifdef BRIAN_DEBUG
-				LOG(DEBUG) << "LDRI: R" << IR.op1 << " <= " << reg[IR.op2];
+				LOG(DEBUG) << "LDRI: R" << IR.op1 << " <= MEM[" << reg[IR.op2] << "] == " << memory.readInt(reg[IR.op2]);
 			#endif
 			reg[IR.op1] = memory.readInt(reg[IR.op2]);
 			break;
