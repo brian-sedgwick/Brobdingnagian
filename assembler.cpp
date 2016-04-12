@@ -276,6 +276,9 @@ int assembler::convertToASCII(string value)
 	{
 		resultValue = 10;
 	}
+	else if(value == "'\\s'"){
+		resultValue = 32;
+	}
 	else if(value == "'")
 	{
 		resultValue = 32;
