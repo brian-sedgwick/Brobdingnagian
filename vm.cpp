@@ -267,6 +267,9 @@ void vm::decodeAndExecute()
 
 		case opCode::STBI:
 		{
+			#ifdef BRIAN_DEBUG
+				LOG(DEBUG) << "STBI: MEM[" << reg[IR.op2] << "] = " << reg[IR.op1];
+			#endif
 			memory.writeChar(reg[IR.op2], reg[IR.op1]);
 			break;
 		}
@@ -279,6 +282,9 @@ void vm::decodeAndExecute()
 
 		case opCode::LDBI:
 		{
+			#ifdef BRIAN_DEBUG
+				LOG(DEBUG) << "LDBI: R" << IR.op1 << " <= MEM[" << reg[IR.op2] << "] == " << memory.readChar(reg[IR.op2]);
+			#endif
 			reg[IR.op1] = memory.readChar(reg[IR.op2]);
 			break;
 		}
